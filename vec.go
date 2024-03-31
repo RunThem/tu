@@ -16,8 +16,8 @@ func NewVec[T any](other ...T) *Vec[T] {
 	return &Vec[T]{items: slices.Clone(other)}
 }
 
-// Size returns the length of the vector.
-func (v *Vec[T]) Size() int {
+// Len returns the length of the vector.
+func (v *Vec[T]) Len() int {
 	return len(v.items)
 }
 
@@ -33,7 +33,7 @@ func (v *Vec[T]) Clear() {
 
 // At returns the value at position pos, returns nil if pos is out off range.
 func (v *Vec[T]) At(idx int) T {
-	if idx < 0 || idx >= v.Size() {
+	if idx < 0 || idx >= v.Len() {
 		panic("out off range")
 	}
 
@@ -47,12 +47,12 @@ func (v *Vec[T]) AtFront() T {
 
 // AtBack returns the last value in the vector, returns nil if the vector is empty.
 func (v *Vec[T]) AtBack() T {
-	return v.At(v.Size() - 1)
+	return v.At(v.Len() - 1)
 }
 
 // Re sets the value it to the vector to position idx.
 func (v *Vec[T]) Re(idx int, it T) {
-	if idx < 0 || idx >= v.Size() {
+	if idx < 0 || idx >= v.Len() {
 		panic("out off range")
 	}
 
@@ -61,7 +61,7 @@ func (v *Vec[T]) Re(idx int, it T) {
 
 // ReFront sets the value it to the vector at position first.
 func (v *Vec[T]) ReFront(it T) {
-	if v.Size() == 0 {
+	if v.Len() == 0 {
 		panic("out off range")
 	}
 
@@ -70,7 +70,7 @@ func (v *Vec[T]) ReFront(it T) {
 
 // ReBack sets the value it to the vector at position back.
 func (v *Vec[T]) ReBack(it T) {
-	if v.Size() == 0 {
+	if v.Len() == 0 {
 		panic("out off range")
 	}
 
@@ -79,12 +79,12 @@ func (v *Vec[T]) ReBack(it T) {
 
 // Pop returns the position idx value of the vector and erase ti, returns nil if the vector is empty.
 func (v *Vec[T]) Pop(idx int) T {
-	if idx < 0 || idx >= v.Size() {
+	if idx < 0 || idx >= v.Len() {
 		panic("out off range")
 	}
 
 	item := v.items[idx]
-	if idx != v.Size()-1 {
+	if idx != v.Len()-1 {
 		copy(v.items[idx:], v.items[idx+1:])
 	}
 
@@ -100,17 +100,17 @@ func (v *Vec[T]) PopFront() T {
 
 // PopBack returns the last value of the vector and erase ti, returns nil if the vector is empty.
 func (v *Vec[T]) PopBack() T {
-	return v.Pop(v.Size() - 1)
+	return v.Pop(v.Len() - 1)
 }
 
 // Put inserts the value it to the vector at position pos.
 func (v *Vec[T]) Put(idx int, it T) {
-	if idx < 0 || idx > v.Size() {
+	if idx < 0 || idx > v.Len() {
 		panic("out off range")
 	}
 
 	v.items = append(v.items, it)
-	if idx != v.Size() {
+	if idx != v.Len() {
 		copy(v.items[idx+1:], v.items[idx:])
 		v.items[idx] = it
 	}
@@ -123,7 +123,7 @@ func (v *Vec[T]) PutFront(it T) {
 
 // PutBack inserts the value it to the vector at position pos.
 func (v *Vec[T]) PutBack(it T) {
-	v.Put(v.Size(), it)
+	v.Put(v.Len(), it)
 }
 
 // String returns a string representation of the vector.
@@ -136,7 +136,7 @@ func (v *Vec[T]) Range(order bool) iter.Seq2[int, T] {
 	var fn iter.Seq2[int, T]
 	if order {
 		fn = func(yield func(int, T) bool) {
-			for i := 0; i < v.Size(); i++ {
+			for i := 0; i < v.Len(); i++ {
 				if !yield(i, v.items[i]) {
 					return
 				}
@@ -146,7 +146,7 @@ func (v *Vec[T]) Range(order bool) iter.Seq2[int, T] {
 		}
 	} else {
 		fn = func(yield func(int, T) bool) {
-			for i := v.Size() - 1; i >= 0; i-- {
+			for i := v.Len() - 1; i >= 0; i-- {
 				if !yield(i, v.items[i]) {
 					return
 				}

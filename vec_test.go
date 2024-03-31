@@ -13,7 +13,7 @@ func TestPut(t *testing.T) {
 	v := NewVec[int]()
 
 	a.True(v.Empty())
-	a.Equal(0, v.Size())
+	a.Equal(0, v.Len())
 
 	// [7, 8, 9]
 	v.PutBack(7)
@@ -31,7 +31,7 @@ func TestPut(t *testing.T) {
 	v.Put(5, 6)
 
 	a.False(v.Empty())
-	a.Equal(9, v.Size())
+	a.Equal(9, v.Len())
 
 	a.Equal(expected, v.items)
 }
@@ -41,7 +41,7 @@ func TestPop(t *testing.T) {
 	v := NewVec[int](expected...)
 
 	a.False(v.Empty())
-	a.Equal(9, v.Size())
+	a.Equal(9, v.Len())
 
 	a.Equal(expected, v.items)
 
@@ -57,7 +57,7 @@ func TestAt(t *testing.T) {
 	v := NewVec[int](expected...)
 
 	a.False(v.Empty())
-	a.Equal(9, v.Size())
+	a.Equal(9, v.Len())
 
 	a.Equal(expected, v.items)
 
@@ -74,7 +74,7 @@ func TestRe(t *testing.T) {
 	v := NewVec[int](expected...)
 
 	a.False(v.Empty())
-	a.Equal(9, v.Size())
+	a.Equal(9, v.Len())
 
 	a.Equal(expected, v.items)
 
