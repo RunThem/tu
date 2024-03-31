@@ -12,8 +12,8 @@ type Vec[T any] struct {
 }
 
 // NewVec creates a new vector.
-func NewVec[T any](other ...T) *Vec[T] {
-	return &Vec[T]{items: slices.Clone(other)}
+func NewVec[T any](other ...T) Vec[T] {
+	return Vec[T]{items: slices.Clone(other)}
 }
 
 // Len returns the length of the vector.
@@ -161,7 +161,7 @@ func (v *Vec[T]) Range(order bool) iter.Seq2[int, T] {
 
 // Map invokes the given function once for each element and returns a container containing the values returned by the
 // given function.
-func (v *Vec[T]) Map(fn func(idx int, it T) T) *Vec[T] {
+func (v *Vec[T]) Map(fn func(idx int, it T) T) Vec[T] {
 	vec := NewVec[T]()
 
 	for i, it := range v.Range(true) {
@@ -172,7 +172,7 @@ func (v *Vec[T]) Map(fn func(idx int, it T) T) *Vec[T] {
 }
 
 // Filter returns a new container containing all elements for which the given function returns a true value.
-func (v *Vec[T]) Filter(fn func(idx int, it T) bool) *Vec[T] {
+func (v *Vec[T]) Filter(fn func(idx int, it T) bool) Vec[T] {
 	vec := NewVec[T]()
 
 	for i, it := range v.Range(true) {
