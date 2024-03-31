@@ -5,10 +5,10 @@ import (
 	"testing"
 )
 
-var expected = []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
-var rexpected = []int{9, 8, 7, 6, 5, 4, 3, 2, 1}
+var vec_expected = []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+var vec_rexpected = []int{9, 8, 7, 6, 5, 4, 3, 2, 1}
 
-func TestPut(t *testing.T) {
+func TestVec_Put(t *testing.T) {
 	a := assert.New(t)
 	v := NewVec[int]()
 
@@ -33,17 +33,17 @@ func TestPut(t *testing.T) {
 	a.False(v.IsEmpty())
 	a.Equal(9, v.Len())
 
-	a.Equal(expected, v.items)
+	a.Equal(vec_expected, v.items)
 }
 
-func TestPop(t *testing.T) {
+func TestVec_Pop(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](expected...)
+	v := NewVec[int](vec_expected...)
 
 	a.False(v.IsEmpty())
 	a.Equal(9, v.Len())
 
-	a.Equal(expected, v.items)
+	a.Equal(vec_expected, v.items)
 
 	for i := 1; i < 8; i++ {
 		a.Equal(i+1, v.Pop(1))
@@ -52,14 +52,14 @@ func TestPop(t *testing.T) {
 	a.Equal([]int{1, 9}, v.items)
 }
 
-func TestAt(t *testing.T) {
+func TestVec_At(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](expected...)
+	v := NewVec[int](vec_expected...)
 
 	a.False(v.IsEmpty())
 	a.Equal(9, v.Len())
 
-	a.Equal(expected, v.items)
+	a.Equal(vec_expected, v.items)
 
 	a.Equal(1, v.AtFront())
 	a.Equal(9, v.AtBack())
@@ -69,14 +69,14 @@ func TestAt(t *testing.T) {
 	}
 }
 
-func TestRe(t *testing.T) {
+func TestVec_Re(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](expected...)
+	v := NewVec[int](vec_expected...)
 
 	a.False(v.IsEmpty())
 	a.Equal(9, v.Len())
 
-	a.Equal(expected, v.items)
+	a.Equal(vec_expected, v.items)
 
 	v.ReFront(9)
 	v.ReBack(1)
@@ -85,12 +85,12 @@ func TestRe(t *testing.T) {
 		v.Re(i, 9-i)
 	}
 
-	a.Equal(rexpected, v.items)
+	a.Equal(vec_rexpected, v.items)
 }
 
-func TestRange(t *testing.T) {
+func TestVec_Range(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](expected...)
+	v := NewVec[int](vec_expected...)
 
 	for i, it := range v.Range(true) {
 		a.Equal(i+1, it)
@@ -101,43 +101,43 @@ func TestRange(t *testing.T) {
 	}
 }
 
-func TestMap(t *testing.T) {
+func TestVec_Map(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](expected...)
+	v := NewVec[int](vec_expected...)
 
 	a.Equal([]int{2, 4, 6, 8, 10, 12, 14, 16, 18},
 		v.Map(func(idx int, it int) int { return it * 2 }).items)
 }
 
-func TestFilter(t *testing.T) {
+func TestVec_Filter(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](expected...)
+	v := NewVec[int](vec_expected...)
 
 	a.Equal([]int{2, 4, 6, 8},
 		v.Filter(func(idx int, it int) bool { return it%2 == 0 }).items)
 }
 
-func TestAny(t *testing.T) {
+func TestVec_Any(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](expected...)
+	v := NewVec[int](vec_expected...)
 
 	a.True(v.IsAny(func(idx int, it int) bool { return it == 9 }))
 
 	a.False(v.IsAny(func(idx int, it int) bool { return it == 0 }))
 }
 
-func TestAll(t *testing.T) {
+func TestVec_All(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](expected...)
+	v := NewVec[int](vec_expected...)
 
 	a.True(v.IsAll(func(idx int, it int) bool { return it > 0 }))
 
 	a.False(v.IsAll(func(idx int, it int) bool { return it > 1 }))
 }
 
-func TestFind(t *testing.T) {
+func TestVec_Find(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](expected...)
+	v := NewVec[int](vec_expected...)
 
 	i, val := v.Find(func(idx int, it int) bool { return it == 9 })
 
@@ -145,18 +145,18 @@ func TestFind(t *testing.T) {
 	a.Equal(val, 9)
 }
 
-func TestIndex(t *testing.T) {
+func TestVec_Index(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](expected...)
+	v := NewVec[int](vec_expected...)
 
 	i := v.Index(func(it int) bool { return it == 9 })
 
 	a.Equal(i, 8)
 }
 
-func TestSort(t *testing.T) {
+func TestVec_Sort(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](expected...)
+	v := NewVec[int](vec_expected...)
 
 	cmp := func(a, b int) int {
 		if a > b {
@@ -172,7 +172,7 @@ func TestSort(t *testing.T) {
 
 	v.Sort(cmp)
 
-	a.Equal(rexpected, v.items)
+	a.Equal(vec_rexpected, v.items)
 
 	a.True(v.IsSorted(cmp))
 }
