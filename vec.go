@@ -12,12 +12,8 @@ type Vec[T any] struct {
 }
 
 // NewVec creates a new vector.
-func NewVec[T any](items ...T) *Vec[T] {
-	v := &Vec[T]{items: make([]T, 0)}
-
-	v.items = append(v.items, items...)
-
-	return v
+func NewVec[T any](other ...T) *Vec[T] {
+	return &Vec[T]{items: slices.Clone(other)}
 }
 
 // Size returns the length of the vector.
