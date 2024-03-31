@@ -12,7 +12,7 @@ func TestPut(t *testing.T) {
 	a := assert.New(t)
 	v := NewVec[int]()
 
-	a.True(v.Empty())
+	a.True(v.IsEmpty())
 	a.Equal(0, v.Len())
 
 	// [7, 8, 9]
@@ -30,7 +30,7 @@ func TestPut(t *testing.T) {
 	v.Put(4, 5)
 	v.Put(5, 6)
 
-	a.False(v.Empty())
+	a.False(v.IsEmpty())
 	a.Equal(9, v.Len())
 
 	a.Equal(expected, v.items)
@@ -40,7 +40,7 @@ func TestPop(t *testing.T) {
 	a := assert.New(t)
 	v := NewVec[int](expected...)
 
-	a.False(v.Empty())
+	a.False(v.IsEmpty())
 	a.Equal(9, v.Len())
 
 	a.Equal(expected, v.items)
@@ -56,7 +56,7 @@ func TestAt(t *testing.T) {
 	a := assert.New(t)
 	v := NewVec[int](expected...)
 
-	a.False(v.Empty())
+	a.False(v.IsEmpty())
 	a.Equal(9, v.Len())
 
 	a.Equal(expected, v.items)
@@ -73,7 +73,7 @@ func TestRe(t *testing.T) {
 	a := assert.New(t)
 	v := NewVec[int](expected...)
 
-	a.False(v.Empty())
+	a.False(v.IsEmpty())
 	a.Equal(9, v.Len())
 
 	a.Equal(expected, v.items)
@@ -121,18 +121,18 @@ func TestAny(t *testing.T) {
 	a := assert.New(t)
 	v := NewVec[int](expected...)
 
-	a.True(v.Any(func(idx int, it int) bool { return it == 9 }))
+	a.True(v.IsAny(func(idx int, it int) bool { return it == 9 }))
 
-	a.False(v.Any(func(idx int, it int) bool { return it == 0 }))
+	a.False(v.IsAny(func(idx int, it int) bool { return it == 0 }))
 }
 
 func TestAll(t *testing.T) {
 	a := assert.New(t)
 	v := NewVec[int](expected...)
 
-	a.True(v.All(func(idx int, it int) bool { return it > 0 }))
+	a.True(v.IsAll(func(idx int, it int) bool { return it > 0 }))
 
-	a.False(v.All(func(idx int, it int) bool { return it > 1 }))
+	a.False(v.IsAll(func(idx int, it int) bool { return it > 1 }))
 }
 
 func TestFind(t *testing.T) {

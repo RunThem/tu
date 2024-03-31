@@ -21,8 +21,8 @@ func (v *Vec[T]) Len() int {
 	return len(v.items)
 }
 
-// Empty returns true if the vector is empty, otherwise returns false.
-func (v *Vec[T]) Empty() bool {
+// IsEmpty returns true if the vector is empty, otherwise returns false.
+func (v *Vec[T]) IsEmpty() bool {
 	return len(v.items) == 0
 }
 
@@ -184,9 +184,9 @@ func (v *Vec[T]) Filter(fn func(idx int, it T) bool) Vec[T] {
 	return vec
 }
 
-// Any passes each element of the collection to the given function and returns true if the function ever returns true
+// IsAny passes each element of the collection to the given function and returns true if the function ever returns true
 // for any element.
-func (v *Vec[T]) Any(fn func(idx int, it T) bool) bool {
+func (v *Vec[T]) IsAny(fn func(idx int, it T) bool) bool {
 	for i, it := range v.Range(true) {
 		if fn(i, it) {
 			return true
@@ -196,9 +196,9 @@ func (v *Vec[T]) Any(fn func(idx int, it T) bool) bool {
 	return false
 }
 
-// All passes each element of the collection to the given function and returns true if the function returns true for
+// IsAll passes each element of the collection to the given function and returns true if the function returns true for
 // all elements.
-func (v *Vec[T]) All(fn func(idx int, it T) bool) bool {
+func (v *Vec[T]) IsAll(fn func(idx int, it T) bool) bool {
 	for i, it := range v.Range(true) {
 		if !fn(i, it) {
 			return false
