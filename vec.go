@@ -1,7 +1,6 @@
 package u
 
 import (
-	"cmp"
 	"fmt"
 	"iter"
 	"slices"
@@ -252,7 +251,7 @@ func (v *Vec[T]) Sort(fn func(a, b T) int) {
 // IsSorted reports whether x is sorted in ascending order, with cmp as the
 // comparison function as defined by [Sort].
 func (v *Vec[T]) IsSorted(fn func(a, b T) int) bool {
-	return slices.IsSortedFunc(v.items, cmp.Compare[T])
+	return slices.IsSortedFunc(v.items, fn)
 }
 
 // Min returns the minimal value in x, using cmp to compare elements.
