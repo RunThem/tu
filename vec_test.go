@@ -181,3 +181,14 @@ func TestVec_Sort(t *testing.T) {
 	a.Equal(vec_expected, v.items)
 	a.True(v.IsSortedBy(cmp.Compare[int]))
 }
+
+func TestVec_Copy(t *testing.T) {
+	a := assert.New(t)
+	v := NewVec[int](cmp.Compare[int], vec_rexpected...)
+
+	v1 := v.Copy()
+
+	a.Equal(v.Len(), v1.Len())
+
+	a.Equal(v.items, v1.items)
+}
