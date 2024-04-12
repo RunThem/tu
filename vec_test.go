@@ -1,8 +1,10 @@
 package u
 
 import (
-	"github.com/stretchr/testify/assert"
+	"cmp"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var vec_expected = []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
@@ -10,7 +12,7 @@ var vec_rexpected = []int{9, 8, 7, 6, 5, 4, 3, 2, 1}
 
 func TestVec_Put(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int]()
+	v := NewVec[int](cmp.Compare[int])
 
 	a.True(v.IsEmpty())
 	a.Equal(0, v.Len())
@@ -38,7 +40,7 @@ func TestVec_Put(t *testing.T) {
 
 func TestVec_Pop(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](vec_expected...)
+	v := NewVec[int](cmp.Compare[int], vec_expected...)
 
 	a.False(v.IsEmpty())
 	a.Equal(9, v.Len())
@@ -54,7 +56,7 @@ func TestVec_Pop(t *testing.T) {
 
 func TestVec_At(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](vec_expected...)
+	v := NewVec[int](cmp.Compare[int], vec_expected...)
 
 	a.False(v.IsEmpty())
 	a.Equal(9, v.Len())
@@ -71,7 +73,7 @@ func TestVec_At(t *testing.T) {
 
 func TestVec_Re(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](vec_expected...)
+	v := NewVec[int](cmp.Compare[int], vec_expected...)
 
 	a.False(v.IsEmpty())
 	a.Equal(9, v.Len())
@@ -90,7 +92,7 @@ func TestVec_Re(t *testing.T) {
 
 func TestVec_Range(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](vec_expected...)
+	v := NewVec[int](cmp.Compare[int], vec_expected...)
 
 	for i, it := range v.Range(true) {
 		a.Equal(i+1, it)
@@ -103,7 +105,7 @@ func TestVec_Range(t *testing.T) {
 
 func TestVec_Map(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](vec_expected...)
+	v := NewVec[int](cmp.Compare[int], vec_expected...)
 
 	a.Equal([]int{2, 4, 6, 8, 10, 12, 14, 16, 18},
 		v.Map(func(idx int, it int) int { return it * 2 }).items)
@@ -111,7 +113,7 @@ func TestVec_Map(t *testing.T) {
 
 func TestVec_Filter(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](vec_expected...)
+	v := NewVec[int](cmp.Compare[int], vec_expected...)
 
 	a.Equal([]int{2, 4, 6, 8},
 		v.Filter(func(idx int, it int) bool { return it%2 == 0 }).items)
@@ -119,7 +121,7 @@ func TestVec_Filter(t *testing.T) {
 
 func TestVec_Any(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](vec_expected...)
+	v := NewVec[int](cmp.Compare[int], vec_expected...)
 
 	a.True(v.IsAny(func(idx int, it int) bool { return it == 9 }))
 
@@ -128,7 +130,7 @@ func TestVec_Any(t *testing.T) {
 
 func TestVec_All(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](vec_expected...)
+	v := NewVec[int](cmp.Compare[int], vec_expected...)
 
 	a.True(v.IsAll(func(idx int, it int) bool { return it > 0 }))
 
@@ -137,9 +139,14 @@ func TestVec_All(t *testing.T) {
 
 func TestVec_Find(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](vec_expected...)
+	v := NewVec[int](cmp.Compare[int], vec_expected...)
 
-	i, val := v.Find(func(idx int, it int) bool { return it == 9 })
+	i, val := v.Find(9)
+
+	a.Equal(i, 8)
+	a.Equal(val, 9)
+
+	i, val = v.FindBy(func(idx int, it int) bool { return it == 9 })
 
 	a.Equal(i, 8)
 	a.Equal(val, 9)
@@ -147,32 +154,30 @@ func TestVec_Find(t *testing.T) {
 
 func TestVec_Index(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](vec_expected...)
+	v := NewVec[int](cmp.Compare[int], vec_expected...)
 
-	i := v.Index(func(it int) bool { return it == 9 })
+	i := v.Index(9)
+
+	a.Equal(i, 8)
+
+	i = v.IndexBy(func(it int) bool { return it == 9 })
 
 	a.Equal(i, 8)
 }
 
 func TestVec_Sort(t *testing.T) {
 	a := assert.New(t)
-	v := NewVec[int](vec_expected...)
+	v := NewVec[int](cmp.Compare[int], vec_rexpected...)
 
-	cmp := func(a, b int) int {
-		if a > b {
-			return -1
-		} else if a < b {
-			return 1
-		}
+	a.False(v.IsSorted())
+	v.Sort()
+	a.Equal(vec_expected, v.items)
+	a.True(v.IsSorted())
 
-		return 0
-	}
+	v = NewVec[int](cmp.Compare[int], vec_rexpected...)
 
-	a.False(v.IsSorted(cmp))
-
-	v.Sort(cmp)
-
-	a.Equal(vec_rexpected, v.items)
-
-	a.True(v.IsSorted(cmp))
+	a.False(v.IsSortedBy(cmp.Compare[int]))
+	v.SortBy(cmp.Compare[int])
+	a.Equal(vec_expected, v.items)
+	a.True(v.IsSortedBy(cmp.Compare[int]))
 }
