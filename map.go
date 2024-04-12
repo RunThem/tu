@@ -6,60 +6,65 @@ import (
 	"maps"
 )
 
-type Map[K comparable, T any] struct {
-	maps map[K]T
+type Map[K comparable, V any] struct {
+	items map[K]V
 }
 
-func NewMap[K comparable, T any](other map[K]T) Map[K, T] {
-	m := Map[K, T]{}
+func NewMap[K comparable, V any](other map[K]V) *Map[K, V] {
+	m := &Map[K, V]{}
 	if other != nil {
-		m.maps = maps.Clone(other)
+		m.items = maps.Clone(other)
 	} else {
-		m.maps = make(map[K]T)
+		m.items = make(map[K]V)
 	}
 
 	return m
 }
 
-func (m *Map[K, T]) Len() int {
-	return len(m.maps)
+func (mod *Map[K, V]) Len() int {
+	return len(mod.items)
 }
 
-func (m *Map[K, T]) IsEmpty() bool {
-	return len(m.maps) == 0
+func (mod *Map[K, V]) IsEmpty() bool {
+	return len(mod.items) == 0
 }
 
-func (m *Map[K, T]) Clear() {
+func (mod *Map[K, V]) Clear() {
 }
 
-func (m *Map[K, T]) At(key K) T {
-	return m.maps[key]
+func (mod *Map[K, V]) IsExist(key K) bool {
+	_, ok := mod.items[key]
+	return ok
 }
 
-func (m *Map[K, T]) Re(key K, val T) {
-	m.maps[key] = val
+func (mod *Map[K, V]) At(key K) V {
+	return mod.items[key]
 }
 
-func (m *Map[K, T]) Pop(key K) T {
-	v, ok := m.maps[key]
+func (mod *Map[K, V]) Re(key K, val V) {
+	mod.items[key] = val
+}
+
+func (mod *Map[K, V]) Pop(key K) V {
+	v, ok := mod.items[key]
 	if ok {
-		delete(m.maps, key)
+		delete(mod.items, key)
 	}
 
 	return v
 }
 
-func (m *Map[K, T]) Put(key K, val T) {
-	m.maps[key] = val
+func (mod *Map[K, V]) Put(key K, val V) {
+	mod.items[key] = val
 }
 
-func (m *Map[K, T]) String() string {
-	return fmt.Sprintf("+%v", m.maps)
+func (mod *Map[K, V]) String() string {
+	return fmt.Sprintf("+%v", mod.items)
 }
 
-func (m *Map[K, T]) Range() iter.Seq2[K, T] {
-	return func(yield func(K, T) bool) {
-		for k, v := range m.maps {
+func (mod *Map[K, V]) Range() iter.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		for k, v := range mod.items {
 			if !yield(k, v) {
 				return
 			}
@@ -67,5 +72,68 @@ func (m *Map[K, T]) Range() iter.Seq2[K, T] {
 
 		return
 	}
+}
 
+func (mod *Map[K, V]) Map(fn func(key K, val V) V) *Map[K, V] {
+	m := NewMap[K, V](nil)
+
+	for k, v := range mod.Range() {
+		m.Put(k, fn(k, v))
+	}
+
+	return m
+}
+
+func (mod *Map[K, V]) Filter(fn func(key K, val V) bool) *Map[K, V] {
+	m := NewMap[K, V](nil)
+
+	for k, v := range mod.Range() {
+		if fn(k, v) {
+			m.Put(k, v)
+		}
+	}
+
+	return m
+}
+
+func (mod *Map[K, V]) IsAny(fn func(key K, val V) bool) bool {
+	for k, v := range mod.Range() {
+		if fn(k, v) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (mod *Map[K, V]) IsAll(fn func(key K, val V) bool) bool {
+	for k, v := range mod.Range() {
+		if !fn(k, v) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (mod *Map[K, V]) Keys() *Vec[K] {
+	vec := NewVec[K](nil)
+	for k, _ := range mod.Range() {
+		vec.PutBack(k)
+	}
+
+	return vec
+}
+
+func (mod *Map[K, V]) Vals() *Vec[V] {
+	vec := NewVec[V](nil)
+	for _, v := range mod.Range() {
+		vec.PutBack(v)
+	}
+
+	return vec
+}
+
+func (mod *Map[K, V]) Copy() *Map[K, V] {
+	return &Map[K, V]{items: maps.Clone(mod.items)}
 }
