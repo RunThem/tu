@@ -1,4 +1,4 @@
-module github.com/RunThem/u
+module github.com/RunThem/tu
 
 go 1.22
 
