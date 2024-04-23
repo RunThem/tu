@@ -1,5 +1,5 @@
-# u
+# Tiny U
 
 ## Introduction
 
-`u` is a data structure and algorithm library for golang.
+`Tiny U` is a data structure and algorithm library for golang.
