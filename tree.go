@@ -57,34 +57,34 @@ func (mod *node[K, V]) string(prefix string, isTail bool, str *string) {
 	}
 }
 
-type Avl[K, V any] struct {
+type Tree[K, V any] struct {
 	root *node[K, V]
 	len  int
 	cmp  func(K, K) int
 }
 
-func NewAvl[K, V any](cmp func(K, K) int) *Avl[K, V] {
+func NewTree[K, V any](cmp func(K, K) int) *Tree[K, V] {
 	if cmp == nil {
 		return nil
 	}
 
-	return &Avl[K, V]{cmp: cmp}
+	return &Tree[K, V]{cmp: cmp}
 }
 
-func (mod *Avl[K, V]) Len() int {
+func (mod *Tree[K, V]) Len() int {
 	return mod.len
 }
 
-func (mod *Avl[K, V]) IsEmpty() bool {
+func (mod *Tree[K, V]) IsEmpty() bool {
 	return mod.len == 0
 }
 
-func (mod *Avl[K, V]) Clear() {
+func (mod *Tree[K, V]) Clear() {
 	mod.root = nil
 	mod.len = 0
 }
 
-func (mod *Avl[K, V]) IsExist(key K) bool {
+func (mod *Tree[K, V]) IsExist(key K) bool {
 	n := mod.root
 	for n != nil {
 		resutl := mod.cmp(key, n.key)
@@ -102,7 +102,7 @@ func (mod *Avl[K, V]) IsExist(key K) bool {
 	return n != nil
 }
 
-func (mod *Avl[K, V]) At(key K) V {
+func (mod *Tree[K, V]) At(key K) V {
 	var val V
 
 	n := mod.root
@@ -126,7 +126,7 @@ func (mod *Avl[K, V]) At(key K) V {
 	return val
 }
 
-func (mod *Avl[K, V]) Next(key K) V {
+func (mod *Tree[K, V]) Next(key K) V {
 	var val V
 
 	n := mod.root
@@ -150,7 +150,7 @@ func (mod *Avl[K, V]) Next(key K) V {
 	return val
 }
 
-func (mod *Avl[K, V]) Prev(key K) V {
+func (mod *Tree[K, V]) Prev(key K) V {
 	var val V
 
 	n := mod.root
@@ -174,7 +174,7 @@ func (mod *Avl[K, V]) Prev(key K) V {
 	return val
 }
 
-func (mod *Avl[K, V]) Re(key K, val V) {
+func (mod *Tree[K, V]) Re(key K, val V) {
 	n := mod.root
 	for n != nil {
 		resutl := mod.cmp(key, n.key)
@@ -194,16 +194,16 @@ func (mod *Avl[K, V]) Re(key K, val V) {
 	}
 }
 
-func (mod *Avl[K, V]) Pop(key K) V {
+func (mod *Tree[K, V]) Pop(key K) V {
 	return mod.pop(key)
 }
 
-func (mod *Avl[K, V]) Put(key K, val V) {
+func (mod *Tree[K, V]) Put(key K, val V) {
 	mod.put(key, val)
 }
 
-func (mod *Avl[K, V]) String() string {
-	str := "Avl Tree\n"
+func (mod *Tree[K, V]) String() string {
+	str := "Tree Tree\n"
 	if !mod.IsEmpty() {
 		mod.root.string("", true, &str)
 	}
@@ -211,7 +211,7 @@ func (mod *Avl[K, V]) String() string {
 	return str
 }
 
-func (mod *Avl[K, V]) Range(order bool) iter.Seq2[K, V] {
+func (mod *Tree[K, V]) Range(order bool) iter.Seq2[K, V] {
 	var fn iter.Seq2[K, V]
 	if order {
 		fn = func(yield func(K, V) bool) {
@@ -234,29 +234,29 @@ func (mod *Avl[K, V]) Range(order bool) iter.Seq2[K, V] {
 	return fn
 }
 
-func (mod *Avl[K, V]) Map(fn func(key K, val V) V) *Avl[K, V] {
-	avl := NewAvl[K, V](mod.cmp)
+func (mod *Tree[K, V]) Map(fn func(key K, val V) V) *Tree[K, V] {
+	tree := NewTree[K, V](mod.cmp)
 
 	for k, v := range mod.Range(true) {
-		avl.Put(k, fn(k, v))
+		tree.Put(k, fn(k, v))
 	}
 
-	return avl
+	return tree
 }
 
-func (mod *Avl[K, V]) Filter(fn func(key K, val V) bool) *Avl[K, V] {
-	avl := NewAvl[K, V](mod.cmp)
+func (mod *Tree[K, V]) Filter(fn func(key K, val V) bool) *Tree[K, V] {
+	tree := NewTree[K, V](mod.cmp)
 
 	for k, v := range mod.Range(true) {
 		if fn(k, v) {
-			avl.put(k, v)
+			tree.put(k, v)
 		}
 	}
 
-	return avl
+	return tree
 }
 
-func (mod *Avl[K, V]) IsAny(fn func(key K, val V) bool) bool {
+func (mod *Tree[K, V]) IsAny(fn func(key K, val V) bool) bool {
 	for k, v := range mod.Range(true) {
 		if fn(k, v) {
 			return true
@@ -266,7 +266,7 @@ func (mod *Avl[K, V]) IsAny(fn func(key K, val V) bool) bool {
 	return false
 }
 
-func (mod *Avl[K, V]) IsAll(fn func(key K, val V) bool) bool {
+func (mod *Tree[K, V]) IsAll(fn func(key K, val V) bool) bool {
 	for k, v := range mod.Range(true) {
 		if !fn(k, v) {
 			return false
@@ -276,21 +276,21 @@ func (mod *Avl[K, V]) IsAll(fn func(key K, val V) bool) bool {
 	return true
 }
 
-func (mod *Avl[K, V]) Copy() *Avl[K, V] {
-	avl := NewAvl[K, V](mod.cmp)
+func (mod *Tree[K, V]) Copy() *Tree[K, V] {
+	tree := NewTree[K, V](mod.cmp)
 
 	for k, v := range mod.Range(true) {
-		avl.put(k, v)
+		tree.put(k, v)
 	}
 
-	return avl
+	return tree
 }
 
 /*
  * api
  *
  */
-func (mod *Avl[K, V]) rangeFrist() *node[K, V] {
+func (mod *Tree[K, V]) rangeFrist() *node[K, V] {
 	n := mod.root
 
 	if n == nil {
@@ -304,7 +304,7 @@ func (mod *Avl[K, V]) rangeFrist() *node[K, V] {
 	return n
 }
 
-func (mod *Avl[K, V]) rangeNext(n *node[K, V]) *node[K, V] {
+func (mod *Tree[K, V]) rangeNext(n *node[K, V]) *node[K, V] {
 	if n.right != nil {
 		n = n.right
 		for n.left != nil {
@@ -324,7 +324,7 @@ func (mod *Avl[K, V]) rangeNext(n *node[K, V]) *node[K, V] {
 	return n
 }
 
-func (mod *Avl[K, V]) rangeLast() *node[K, V] {
+func (mod *Tree[K, V]) rangeLast() *node[K, V] {
 	n := mod.root
 
 	if n == nil {
@@ -338,7 +338,7 @@ func (mod *Avl[K, V]) rangeLast() *node[K, V] {
 	return n
 }
 
-func (mod *Avl[K, V]) rangePrev(n *node[K, V]) *node[K, V] {
+func (mod *Tree[K, V]) rangePrev(n *node[K, V]) *node[K, V] {
 	if n.left != nil {
 		n = n.left
 		for n.right != nil {
@@ -358,7 +358,7 @@ func (mod *Avl[K, V]) rangePrev(n *node[K, V]) *node[K, V] {
 	return n
 }
 
-func (mod *Avl[K, V]) put(key K, val V) {
+func (mod *Tree[K, V]) put(key K, val V) {
 	link := &mod.root
 
 	var parent *node[K, V]
@@ -367,7 +367,7 @@ func (mod *Avl[K, V]) put(key K, val V) {
 
 		result := mod.cmp(key, parent.key)
 		if result == 0 {
-			return // avl put node already exists.
+			return // tree put node already exists.
 		}
 
 		if result < 0 {
@@ -402,7 +402,7 @@ func (mod *Avl[K, V]) put(key K, val V) {
 	mod.len++
 }
 
-func (mod *Avl[K, V]) pop(key K) V {
+func (mod *Tree[K, V]) pop(key K) V {
 	var val V
 	var p *node[K, V]
 
@@ -461,7 +461,7 @@ func (mod *Avl[K, V]) pop(key K) V {
 	return val
 }
 
-func (mod *Avl[K, V]) popAnd(n *node[K, V]) *node[K, V] {
+func (mod *Tree[K, V]) popAnd(n *node[K, V]) *node[K, V] {
 	old := n
 	n = n.right
 
@@ -493,7 +493,7 @@ func (mod *Avl[K, V]) popAnd(n *node[K, V]) *node[K, V] {
 	return p
 }
 
-func (mod *Avl[K, V]) popOr(n *node[K, V]) *node[K, V] {
+func (mod *Tree[K, V]) popOr(n *node[K, V]) *node[K, V] {
 	ch := n.left
 	if ch == nil {
 		ch = n.right
@@ -509,7 +509,7 @@ func (mod *Avl[K, V]) popOr(n *node[K, V]) *node[K, V] {
 	return p
 }
 
-func (mod *Avl[K, V]) fix(op bool, n *node[K, V]) *node[K, V] {
+func (mod *Tree[K, V]) fix(op bool, n *node[K, V]) *node[K, V] {
 	var th *node[K, V]
 
 	// left
@@ -548,7 +548,7 @@ func (mod *Avl[K, V]) fix(op bool, n *node[K, V]) *node[K, V] {
 	return n
 }
 
-func (mod *Avl[K, V]) rotate(op bool, n *node[K, V]) *node[K, V] {
+func (mod *Tree[K, V]) rotate(op bool, n *node[K, V]) *node[K, V] {
 	var th *node[K, V]
 	p := n.parent
 
@@ -580,7 +580,7 @@ func (mod *Avl[K, V]) rotate(op bool, n *node[K, V]) *node[K, V] {
 	return th
 }
 
-func (mod *Avl[K, V]) replace(p, o, n *node[K, V]) {
+func (mod *Tree[K, V]) replace(p, o, n *node[K, V]) {
 	if p == nil {
 		mod.root = n
 		return
