@@ -200,7 +200,7 @@ func TestTree_Copy(t *testing.T) {
 		tree.Put(i, fmt.Sprintf("%d", i))
 	}
 
-	tree1 := tree.Copy()
+	tree1 := tree.Clone()
 
 	a.Equal(tree.Len(), tree1.Len())
 

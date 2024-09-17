@@ -276,7 +276,7 @@ func (mod *Tree[K, V]) IsAll(fn func(key K, val V) bool) bool {
 	return true
 }
 
-func (mod *Tree[K, V]) Copy() *Tree[K, V] {
+func (mod *Tree[K, V]) Clone() *Tree[K, V] {
 	tree := NewTree[K, V](mod.cmp)
 
 	for k, v := range mod.Range(true) {

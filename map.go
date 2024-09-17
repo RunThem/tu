@@ -117,23 +117,23 @@ func (mod *Map[K, V]) IsAll(fn func(key K, val V) bool) bool {
 }
 
 func (mod *Map[K, V]) Keys() *Vec[K] {
-	vec := NewVec[K](nil)
+	vec := NewVec[K]()
 	for k, _ := range mod.Range() {
-		vec.PutBack(k)
+		vec.Put(-1, k)
 	}
 
 	return vec
 }
 
 func (mod *Map[K, V]) Vals() *Vec[V] {
-	vec := NewVec[V](nil)
+	vec := NewVec[V]()
 	for _, v := range mod.Range() {
-		vec.PutBack(v)
+		vec.Put(-1, v)
 	}
 
 	return vec
 }
 
-func (mod *Map[K, V]) Copy() *Map[K, V] {
+func (mod *Map[K, V]) Clone() *Map[K, V] {
 	return &Map[K, V]{items: maps.Clone(mod.items)}
 }

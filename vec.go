@@ -8,11 +8,14 @@ import (
 
 type Vec[T any] struct {
 	items []T
-	cmp   func(T, T) int
 }
 
-func NewVec[T any](cmp func(T, T) int, other ...T) *Vec[T] {
-	return &Vec[T]{items: slices.Clone(other), cmp: cmp}
+func NewVec[T any]() *Vec[T] {
+	return &Vec[T]{items: make([]T, 0)}
+}
+
+func NewVecFrom[T any](values []T) *Vec[T] {
+	return &Vec[T]{items: slices.Clone(values)}
 }
 
 func (mod *Vec[T]) Len() int {
@@ -28,86 +31,64 @@ func (mod *Vec[T]) Clear() {
 }
 
 func (mod *Vec[T]) At(idx int) T {
-	if idx < 0 || idx >= mod.Len() {
-		panic("out off range")
+	if idx < -mod.Len() || idx >= mod.Len() {
+		panic(fmt.Sprintf("Out of range { %d, %d }", mod.Len(), idx))
+	}
+
+	if idx < 0 {
+		idx += mod.Len()
 	}
 
 	return mod.items[idx]
 }
 
-func (mod *Vec[T]) AtFront() T {
-	return mod.At(0)
-}
-
-func (mod *Vec[T]) AtBack() T {
-	return mod.At(mod.Len() - 1)
-}
-
 func (mod *Vec[T]) Re(idx int, it T) {
-	if idx < 0 || idx >= mod.Len() {
-		panic("out off range")
+	if idx < -mod.Len() || idx >= mod.Len() {
+		panic(fmt.Sprintf("Out of range { %d, %d }", mod.Len(), idx))
+	}
+
+	if idx < 0 {
+		idx += mod.Len()
 	}
 
 	mod.items[idx] = it
 }
 
-func (mod *Vec[T]) ReFront(it T) {
-	if mod.Len() == 0 {
-		panic("out off range")
-	}
-
-	mod.items[0] = it
-}
-
-func (mod *Vec[T]) ReBack(it T) {
-	if mod.Len() == 0 {
-		panic("out off range")
-	}
-
-	mod.items[len(mod.items)-1] = it
-}
-
 func (mod *Vec[T]) Pop(idx int) T {
-	if idx < 0 || idx >= mod.Len() {
-		panic("out off range")
+	if idx < -mod.Len() || idx >= mod.Len() {
+		panic(fmt.Sprintf("Out of range { %d, %d }", mod.Len(), idx))
+	}
+
+	if idx < 0 {
+		idx += mod.Len()
 	}
 
 	item := mod.items[idx]
+
 	if idx != mod.Len()-1 {
 		copy(mod.items[idx:], mod.items[idx+1:])
 	}
 
-	mod.items = mod.items[:len(mod.items)-1]
+	mod.items = mod.items[:mod.Len()-1]
 
 	return item
 }
 
-func (mod *Vec[T]) PopFront() T {
-	return mod.Pop(0)
-}
-
-func (mod *Vec[T]) PopBack() T {
-	return mod.Pop(mod.Len() - 1)
-}
-
 func (mod *Vec[T]) Put(idx int, it T) {
-	if idx < 0 || idx > mod.Len() {
-		panic("out off range")
+	if idx < -(mod.Len()+1) || idx > mod.Len() {
+		panic(fmt.Sprintf("Out of range { %d, %d }", mod.Len(), idx))
+	}
+
+	if idx < 0 {
+		idx += mod.Len() + 1
 	}
 
 	mod.items = append(mod.items, it)
+
 	if idx != mod.Len() {
 		copy(mod.items[idx+1:], mod.items[idx:])
 		mod.items[idx] = it
 	}
-}
-
-func (mod *Vec[T]) PutFront(it T) {
-	mod.Put(0, it)
-}
-
-func (mod *Vec[T]) PutBack(it T) {
-	mod.Put(mod.Len(), it)
 }
 
 func (mod *Vec[T]) String() string {
@@ -142,21 +123,21 @@ func (mod *Vec[T]) Range(order bool) iter.Seq2[int, T] {
 }
 
 func (mod *Vec[T]) Map(fn func(idx int, it T) T) *Vec[T] {
-	vec := NewVec[T](mod.cmp)
+	vec := NewVec[T]()
 
 	for i, it := range mod.Range(true) {
-		vec.PutBack(fn(i, it))
+		vec.Put(-1, fn(i, it))
 	}
 
 	return vec
 }
 
 func (mod *Vec[T]) Filter(fn func(idx int, it T) bool) *Vec[T] {
-	vec := NewVec[T](mod.cmp)
+	vec := NewVec[T]()
 
 	for i, it := range mod.Range(true) {
 		if fn(i, it) {
-			vec.PutBack(it)
+			vec.Put(-1, it)
 		}
 	}
 
@@ -183,20 +164,7 @@ func (mod *Vec[T]) IsAll(fn func(idx int, it T) bool) bool {
 	return true
 }
 
-func (mod *Vec[T]) Find(it T) (int, T) {
-	if mod.cmp != nil {
-		for i, _it := range mod.Range(true) {
-			if mod.cmp(it, _it) == 0 {
-				return i, it
-			}
-		}
-	}
-
-	var t T
-	return -1, t
-}
-
-func (mod *Vec[T]) FindBy(fn func(idx int, it T) bool) (int, T) {
+func (mod *Vec[T]) Find(fn func(idx int, it T) bool) (int, T) {
 	for i, it := range mod.Range(true) {
 		if fn(i, it) {
 			return i, it
@@ -207,19 +175,7 @@ func (mod *Vec[T]) FindBy(fn func(idx int, it T) bool) (int, T) {
 	return -1, t
 }
 
-func (mod *Vec[T]) Index(it T) int {
-	if mod.cmp != nil {
-		for i, _it := range mod.Range(true) {
-			if mod.cmp(it, _it) == 0 {
-				return i
-			}
-		}
-	}
-
-	return -1
-}
-
-func (mod *Vec[T]) IndexBy(fn func(it T) bool) int {
+func (mod *Vec[T]) Index(fn func(it T) bool) int {
 	for i, it := range mod.Range(true) {
 		if fn(it) {
 			return i
@@ -229,35 +185,19 @@ func (mod *Vec[T]) IndexBy(fn func(it T) bool) int {
 	return -1
 }
 
-func (mod *Vec[T]) Sort() {
-	slices.SortFunc(mod.items, mod.cmp)
-}
-
-func (mod *Vec[T]) SortBy(fn func(a, b T) int) {
+func (mod *Vec[T]) Sort(fn func(a, b T) int) {
 	slices.SortFunc(mod.items, fn)
 }
 
-func (mod *Vec[T]) IsSorted() bool {
-	return slices.IsSortedFunc(mod.items, mod.cmp)
-}
-
-func (mod *Vec[T]) IsSortedBy(fn func(a, b T) int) bool {
+func (mod *Vec[T]) IsSorted(fn func(a, b T) int) bool {
 	return slices.IsSortedFunc(mod.items, fn)
 }
 
-func (mod *Vec[T]) Min() T {
-	return slices.MinFunc(mod.items, mod.cmp)
-}
-
-func (mod *Vec[T]) MinBy(fn func(a, b T) int) T {
+func (mod *Vec[T]) Min(fn func(a, b T) int) T {
 	return slices.MinFunc(mod.items, fn)
 }
 
-func (mod *Vec[T]) Max() T {
-	return slices.MaxFunc(mod.items, mod.cmp)
-}
-
-func (mod *Vec[T]) MaxBy(fn func(a, b T) int) T {
+func (mod *Vec[T]) Max(fn func(a, b T) int) T {
 	return slices.MaxFunc(mod.items, fn)
 }
 
@@ -265,12 +205,6 @@ func (mod *Vec[T]) Items() []T {
 	return mod.items
 }
 
-func (mod *Vec[T]) Copy() *Vec[T] {
-	vec := NewVec[T](mod.cmp)
-
-	for _, t := range mod.Range(true) {
-		vec.PutBack(t)
-	}
-
-	return vec
+func (mod *Vec[T]) Clone() *Vec[T] {
+	return NewVecFrom(mod.items)
 }
