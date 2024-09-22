@@ -94,11 +94,11 @@ func TestVec_Range(t *testing.T) {
 	a := assert.New(t)
 	v := NewVecFrom[int](vec_expected)
 
-	for i, it := range v.Range(true) {
+	for i, it := range v.L {
 		a.Equal(i+1, it)
 	}
 
-	for i, it := range v.Range(false) {
+	for i, it := range v.R {
 		a.Equal(i+1, it)
 	}
 }

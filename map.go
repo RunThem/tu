@@ -2,7 +2,6 @@ package tu
 
 import (
 	"fmt"
-	"iter"
 	"maps"
 )
 
@@ -62,22 +61,18 @@ func (mod *Map[K, V]) String() string {
 	return fmt.Sprintf("+%v", mod.items)
 }
 
-func (mod *Map[K, V]) Range() iter.Seq2[K, V] {
-	return func(yield func(K, V) bool) {
-		for k, v := range mod.items {
-			if !yield(k, v) {
-				return
-			}
+func (mod *Map[K, V]) L(yield func(K, V) bool) {
+	for k, v := range mod.items {
+		if !yield(k, v) {
+			return
 		}
-
-		return
 	}
 }
 
 func (mod *Map[K, V]) Map(fn func(key K, val V) V) *Map[K, V] {
 	m := NewMap[K, V](nil)
 
-	for k, v := range mod.Range() {
+	for k, v := range mod.L {
 		m.Put(k, fn(k, v))
 	}
 
@@ -87,7 +82,7 @@ func (mod *Map[K, V]) Map(fn func(key K, val V) V) *Map[K, V] {
 func (mod *Map[K, V]) Filter(fn func(key K, val V) bool) *Map[K, V] {
 	m := NewMap[K, V](nil)
 
-	for k, v := range mod.Range() {
+	for k, v := range mod.L {
 		if fn(k, v) {
 			m.Put(k, v)
 		}
@@ -97,7 +92,7 @@ func (mod *Map[K, V]) Filter(fn func(key K, val V) bool) *Map[K, V] {
 }
 
 func (mod *Map[K, V]) IsAny(fn func(key K, val V) bool) bool {
-	for k, v := range mod.Range() {
+	for k, v := range mod.L {
 		if fn(k, v) {
 			return true
 		}
@@ -107,7 +102,7 @@ func (mod *Map[K, V]) IsAny(fn func(key K, val V) bool) bool {
 }
 
 func (mod *Map[K, V]) IsAll(fn func(key K, val V) bool) bool {
-	for k, v := range mod.Range() {
+	for k, v := range mod.L {
 		if !fn(k, v) {
 			return false
 		}
@@ -118,7 +113,7 @@ func (mod *Map[K, V]) IsAll(fn func(key K, val V) bool) bool {
 
 func (mod *Map[K, V]) Keys() *Vec[K] {
 	vec := NewVec[K]()
-	for k, _ := range mod.Range() {
+	for k, _ := range mod.L {
 		vec.Put(-1, k)
 	}
 
@@ -127,7 +122,7 @@ func (mod *Map[K, V]) Keys() *Vec[K] {
 
 func (mod *Map[K, V]) Vals() *Vec[V] {
 	vec := NewVec[V]()
-	for _, v := range mod.Range() {
+	for _, v := range mod.L {
 		vec.Put(-1, v)
 	}
 

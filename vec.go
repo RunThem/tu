@@ -2,7 +2,6 @@ package tu
 
 import (
 	"fmt"
-	"iter"
 	"slices"
 )
 
@@ -95,37 +94,26 @@ func (mod *Vec[T]) String() string {
 	return fmt.Sprintf("%v", mod.items)
 }
 
-func (mod *Vec[T]) Range(order bool) iter.Seq2[int, T] {
-	var fn iter.Seq2[int, T]
-	if order {
-		fn = func(yield func(int, T) bool) {
-			for i := 0; i < mod.Len(); i++ {
-				if !yield(i, mod.items[i]) {
-					return
-				}
-			}
-
-			return
-		}
-	} else {
-		fn = func(yield func(int, T) bool) {
-			for i := mod.Len() - 1; i >= 0; i-- {
-				if !yield(i, mod.items[i]) {
-					return
-				}
-			}
-
+func (mod *Vec[T]) L(yield func(int, T) bool) {
+	for i := 0; i < mod.Len(); i++ {
+		if !yield(i, mod.items[i]) {
 			return
 		}
 	}
+}
 
-	return fn
+func (mod *Vec[T]) R(yield func(int, T) bool) {
+	for i := mod.Len() - 1; i >= 0; i-- {
+		if !yield(i, mod.items[i]) {
+			return
+		}
+	}
 }
 
 func (mod *Vec[T]) Map(fn func(idx int, it T) T) *Vec[T] {
 	vec := NewVec[T]()
 
-	for i, it := range mod.Range(true) {
+	for i, it := range mod.L {
 		vec.Put(-1, fn(i, it))
 	}
 
@@ -135,7 +123,7 @@ func (mod *Vec[T]) Map(fn func(idx int, it T) T) *Vec[T] {
 func (mod *Vec[T]) Filter(fn func(idx int, it T) bool) *Vec[T] {
 	vec := NewVec[T]()
 
-	for i, it := range mod.Range(true) {
+	for i, it := range mod.L {
 		if fn(i, it) {
 			vec.Put(-1, it)
 		}
@@ -145,7 +133,7 @@ func (mod *Vec[T]) Filter(fn func(idx int, it T) bool) *Vec[T] {
 }
 
 func (mod *Vec[T]) IsAny(fn func(idx int, it T) bool) bool {
-	for i, it := range mod.Range(true) {
+	for i, it := range mod.L {
 		if fn(i, it) {
 			return true
 		}
@@ -155,7 +143,7 @@ func (mod *Vec[T]) IsAny(fn func(idx int, it T) bool) bool {
 }
 
 func (mod *Vec[T]) IsAll(fn func(idx int, it T) bool) bool {
-	for i, it := range mod.Range(true) {
+	for i, it := range mod.L {
 		if !fn(i, it) {
 			return false
 		}
@@ -165,7 +153,7 @@ func (mod *Vec[T]) IsAll(fn func(idx int, it T) bool) bool {
 }
 
 func (mod *Vec[T]) Find(fn func(idx int, it T) bool) (int, T) {
-	for i, it := range mod.Range(true) {
+	for i, it := range mod.L {
 		if fn(i, it) {
 			return i, it
 		}
@@ -176,7 +164,7 @@ func (mod *Vec[T]) Find(fn func(idx int, it T) bool) (int, T) {
 }
 
 func (mod *Vec[T]) Index(fn func(it T) bool) int {
-	for i, it := range mod.Range(true) {
+	for i, it := range mod.L {
 		if fn(it) {
 			return i
 		}

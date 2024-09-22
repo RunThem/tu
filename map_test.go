@@ -33,7 +33,7 @@ func TestMap_Pop(t *testing.T) {
 		m.Put(i, fmt.Sprintf("%d", i))
 	}
 
-	for k, v := range m.Range() {
+	for k, v := range m.L {
 		a.Equal(v, map_expected[k])
 	}
 }
