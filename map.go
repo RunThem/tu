@@ -9,15 +9,12 @@ type Map[K comparable, V any] struct {
 	items map[K]V
 }
 
-func NewMap[K comparable, V any](other map[K]V) *Map[K, V] {
-	m := &Map[K, V]{}
-	if other != nil {
-		m.items = maps.Clone(other)
-	} else {
-		m.items = make(map[K]V)
-	}
+func NewMap[K comparable, V any](values map[K]V) *Map[K, V] {
+	return &Map[K, V]{maps.Clone(values)}
+}
 
-	return m
+func NewMapFrom[K comparable, V any](values map[K]V) *Map[K, V] {
+	return &Map[K, V]{maps.Clone(values)}
 }
 
 func (mod *Map[K, V]) Len() int {
