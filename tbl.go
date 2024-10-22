@@ -78,7 +78,7 @@ func (self Tbl[K, V]) vals() Vec[V] {
 }
 
 func (self Tbl[K, V]) Map(fn func(key K, val V) V) Tbl[K, V] {
-	tbl := make(map[K]V)
+	tbl := NewTbl[K, V]()
 
 	for k, v := range self {
 		tbl[k] = fn(k, v)
@@ -88,11 +88,23 @@ func (self Tbl[K, V]) Map(fn func(key K, val V) V) Tbl[K, V] {
 }
 
 func (self Tbl[K, V]) Filter(fn func(key K, val V) bool) Tbl[K, V] {
-	tbl := make(map[K]V)
+	tbl := NewTbl[K, V]()
 
 	for k, v := range self {
 		if fn(k, v) {
 			tbl[k] = v
+		}
+	}
+
+	return tbl
+}
+
+func (self Tbl[K, V]) FilterMap(fn func(key K, val V) (bool, V)) Tbl[K, V] {
+	tbl := NewTbl[K, V]()
+
+	for k, v := range self {
+		if ok, value := fn(k, v); ok {
+			tbl[k] = value
 		}
 	}
 

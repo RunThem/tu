@@ -125,6 +125,18 @@ func (self *Vec[T]) Filter(fn func(i int, it T) bool) Vec[T] {
 	return vec
 }
 
+func (self *Vec[T]) FilterMap(fn func(i int, it T) (bool, T)) Vec[T] {
+	vec := NewVec[T](self.Len())
+
+	for i, v := range *self {
+		if ok, it := fn(i, v); ok {
+			vec.Put(it)
+		}
+	}
+
+	return vec
+}
+
 func (self *Vec[T]) IsAny(fn func(i int, it T) bool) bool {
 	for i, v := range *self {
 		if fn(i, v) {
