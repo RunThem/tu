@@ -6,6 +6,10 @@ import (
 
 type Tbl[K comparable, V any] map[K]V
 
+// NewTbl return Tbl[K, V], There are two calling forms:
+//
+//	NewTbl[K, V]() return a Tbl[K, V] of length 0.
+//	NewTbl[K, V](map[K, V] | Tbl[K, V]) return a shallow copy Tbl[K, V].
 func NewTbl[K comparable, V any](args ...any) Tbl[K, V] {
 	tbl := make(map[K]V)
 
@@ -40,11 +44,6 @@ func (self Tbl[K, V]) IsEmpty() bool {
 	return self.Len() == 0
 }
 
-func (self Tbl[K, V]) At(key K) (V, bool) {
-	val, ok := self[key]
-	return val, ok
-}
-
 func (self Tbl[K, V]) Put(key K, val V) {
 	self[key] = val
 }
@@ -56,6 +55,26 @@ func (self Tbl[K, V]) Pop(key K) V {
 	}
 
 	return val
+}
+
+func (self Tbl[K, V]) Keys() Vec[K] {
+	vec := NewVec[K](self.Len())
+
+	for k, _ := range self {
+		vec.Put(k)
+	}
+
+	return vec
+}
+
+func (self Tbl[K, V]) vals() Vec[V] {
+	vec := NewVec[V](self.Len())
+
+	for _, v := range self {
+		vec.Put(v)
+	}
+
+	return vec
 }
 
 func (self Tbl[K, V]) Map(fn func(key K, val V) V) Tbl[K, V] {

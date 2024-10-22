@@ -1,7 +1,6 @@
 package tu
 
 import (
-	"fmt"
 	"reflect"
 	"slices"
 	"strings"
@@ -13,7 +12,7 @@ type Vec[T any] []T
 //
 //	NewVec[T]() returns a Vec[T] of length 0 and capacity 8.
 //	NewVec[T](cap) returns a Vec[T] of length 0 and capacity parameter cap.
-//	NewVec[T](Array[T] | Slice[T] | Vec[T]) Returns a shallow copy Vec[T].
+//	NewVec[T](array[T] | slice[T] | Vec[T]) returns a shallow copy Vec[T].
 func NewVec[T any](args ...any) Vec[T] {
 	vec := make([]T, 0, 8)
 
@@ -66,28 +65,12 @@ func (self *Vec[T]) IsEmpty() bool {
 	return self.Len() == 0
 }
 
-func (self *Vec[T]) At(idx int) T {
-	if idx >= self.Len() {
-		panic(fmt.Sprintf("Out of range { %d, %d }", self.Len(), idx))
-	}
-
-	return (*self)[idx]
-}
-
-func (self *Vec[T]) Re(idx int, it T) {
-	if idx >= self.Len() {
-		panic(fmt.Sprintf("Out of range { %d, %d }", self.Len(), idx))
-	}
-
-	*self = slices.Replace(*self, idx, idx+1, it)
-}
-
 func (self *Vec[T]) Put(it T) {
 	*self = slices.Insert(*self, self.Len(), it)
 }
 
 func (self *Vec[T]) Pop() T {
-	it := self.At(self.Len() - 1)
+	it := (*self)[self.Len()-1]
 	*self = (*self)[:self.Len()-1]
 
 	return it
@@ -98,10 +81,26 @@ func (self *Vec[T]) Ins(idx int, it T) {
 }
 
 func (self *Vec[T]) Del(idx int) T {
-	it := self.At(idx)
+	it := (*self)[idx]
 	*self = slices.Delete(*self, idx, idx+1)
 
 	return it
+}
+
+func (self *Vec[T]) IsExist(fn func(it T) bool) bool {
+	return slices.IndexFunc(*self, fn) > 0
+}
+
+func (self *Vec[T]) Index(fn func(it T) bool) int {
+	return slices.IndexFunc(*self, fn)
+}
+
+func (self *Vec[T]) Sort(fn func(a, b T) int) {
+	slices.SortFunc(*self, fn)
+}
+
+func (self *Vec[T]) IsSort(fn func(a, b T) int) bool {
+	return slices.IsSortedFunc(*self, fn)
 }
 
 func (self *Vec[T]) Map(fn func(i int, it T) T) Vec[T] {
@@ -144,20 +143,4 @@ func (self *Vec[T]) IsAll(fn func(i int, it T) bool) bool {
 	}
 
 	return true
-}
-
-func (self *Vec[T]) IsExist(fn func(it T) bool) bool {
-	return slices.IndexFunc(*self, fn) > 0
-}
-
-func (self *Vec[T]) Index(fn func(it T) bool) int {
-	return slices.IndexFunc(*self, fn)
-}
-
-func (self *Vec[T]) Sort(fn func(a, b T) int) {
-	slices.SortFunc(*self, fn)
-}
-
-func (self *Vec[T]) IsSort(fn func(a, b T) int) bool {
-	return slices.IsSortedFunc(*self, fn)
 }

@@ -76,7 +76,3 @@ func TestVec_NewVec(t *testing.T) {
 		a.Equal(vec, vec2)
 	}
 }
-
-func TestVec_Put(t *testing.T) {
-
-}
