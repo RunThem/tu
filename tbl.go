@@ -4,12 +4,13 @@ import (
 	"reflect"
 )
 
+// Tbl is a generic map-like structure for keys of any comparable type K and values of any type V.
 type Tbl[K comparable, V any] map[K]V
 
-// NewTbl return Tbl[K, V], There are two calling forms:
+// NewTbl returns Tbl[K, V], There are two calling forms:
 //
-//	NewTbl[K, V]() return a Tbl[K, V] of length 0.
-//	NewTbl[K, V](map[K, V] | Tbl[K, V]) return a shallow copy Tbl[K, V].
+//	NewTbl[K, V]() returns a Tbl[K, V] of length 0.
+//	NewTbl[K, V](map[K, V] | Tbl[K, V]) returns a shallow copy of the given map or Tbl.
 func NewTbl[K comparable, V any](args ...any) Tbl[K, V] {
 	tbl := make(map[K]V)
 
@@ -36,18 +37,22 @@ func NewTbl[K comparable, V any](args ...any) Tbl[K, V] {
 	return tbl
 }
 
+// Len returns the number of key-value pairs in the table.
 func (self Tbl[K, V]) Len() int {
 	return len(self)
 }
 
+// IsEmpty returns true if the table has no key-value pairs.
 func (self Tbl[K, V]) IsEmpty() bool {
 	return self.Len() == 0
 }
 
+// Put sets the value for a specified key in the table.
 func (self Tbl[K, V]) Put(key K, val V) {
 	self[key] = val
 }
 
+// Pop removes a key-value pair from the table and returns the removed value.
 func (self Tbl[K, V]) Pop(key K) V {
 	val, ok := self[key]
 	if ok {
@@ -57,16 +62,18 @@ func (self Tbl[K, V]) Pop(key K) V {
 	return val
 }
 
+// Keys returns a Vec containing all the keys from the table.
 func (self Tbl[K, V]) Keys() Vec[K] {
 	vec := NewVec[K](self.Len())
 
-	for k, _ := range self {
+	for k := range self {
 		vec.Put(k)
 	}
 
 	return vec
 }
 
+// Vals returns a Vec containing all the values from the table.
 func (self Tbl[K, V]) vals() Vec[V] {
 	vec := NewVec[V](self.Len())
 
@@ -77,6 +84,7 @@ func (self Tbl[K, V]) vals() Vec[V] {
 	return vec
 }
 
+// Map applies a function to each key-value pair and returns a new Tbl with the results.
 func (self Tbl[K, V]) Map(fn func(key K, val V) V) Tbl[K, V] {
 	tbl := NewTbl[K, V]()
 
@@ -87,6 +95,7 @@ func (self Tbl[K, V]) Map(fn func(key K, val V) V) Tbl[K, V] {
 	return tbl
 }
 
+// Filter creates a new Tbl with only the key-value pairs that satisfy the provided function.
 func (self Tbl[K, V]) Filter(fn func(key K, val V) bool) Tbl[K, V] {
 	tbl := NewTbl[K, V]()
 
@@ -99,6 +108,8 @@ func (self Tbl[K, V]) Filter(fn func(key K, val V) bool) Tbl[K, V] {
 	return tbl
 }
 
+// FilterMap applies a function to each key-value pair, filtering and transforming the pairs in the
+// process.
 func (self Tbl[K, V]) FilterMap(fn func(key K, val V) (bool, V)) Tbl[K, V] {
 	tbl := NewTbl[K, V]()
 
@@ -111,6 +122,7 @@ func (self Tbl[K, V]) FilterMap(fn func(key K, val V) (bool, V)) Tbl[K, V] {
 	return tbl
 }
 
+// IsAny returns true if any key-value pair satisfies the provided function.
 func (self Tbl[K, V]) IsAny(fn func(key K, val V) bool) bool {
 	for k, v := range self {
 		if fn(k, v) {
@@ -121,6 +133,7 @@ func (self Tbl[K, V]) IsAny(fn func(key K, val V) bool) bool {
 	return false
 }
 
+// IsAll returns true if all key-value pairs satisfy the provided function.
 func (self Tbl[K, V]) IsAll(fn func(key K, val V) bool) bool {
 	for k, v := range self {
 		if !fn(k, v) {

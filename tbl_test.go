@@ -3,7 +3,6 @@ package tu
 import (
 	"github.com/stretchr/testify/assert"
 	"reflect"
-	"strconv"
 	"testing"
 )
 
@@ -33,11 +32,5 @@ func TestNewTbl(t *testing.T) {
 
 		a.NotNil(tbl2)
 		a.Equal(len(tbl), len(tbl2))
-
-		for i := 0; i < 100; i++ {
-			tbl.Put(i, strconv.Itoa(i))
-		}
-
-		t.Log(tbl)
 	}
 }

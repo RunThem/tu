@@ -6,13 +6,15 @@ import (
 	"strings"
 )
 
+// Vec is a generic vector type for elements of any type.
 type Vec[T any] []T
 
-// NewVec return Vec[T]. There are three calling forms:
+// NewVec returns a Vec[T]. There are three calling forms:
 //
 //	NewVec[T]() returns a Vec[T] of length 0 and capacity 8.
 //	NewVec[T](cap) returns a Vec[T] of length 0 and capacity parameter cap.
-//	NewVec[T](array[T] | slice[T] | Vec[T]) returns a shallow copy Vec[T].
+//	NewVec[T](array[T] | slice[T] | Vec[T]) returns a shallow copy of the given array, slice, or
+//	Vec.
 func NewVec[T any](args ...any) Vec[T] {
 	vec := make([]T, 0, 8)
 
@@ -28,9 +30,9 @@ func NewVec[T any](args ...any) Vec[T] {
 	switch value.Kind() {
 	case reflect.Slice:
 		if strings.HasPrefix(value.Type().Name(), "Vec") {
-			vec = append(args[0].(Vec[T]))
+			vec = append(vec, args[0].(Vec[T])...)
 		} else {
-			vec = append(args[0].([]T))
+			vec = append(vec, args[0].([]T)...)
 		}
 
 	case reflect.Array:
@@ -53,22 +55,27 @@ func NewVec[T any](args ...any) Vec[T] {
 	return vec
 }
 
+// Len returns the number of elements in the vector.
 func (self *Vec[T]) Len() int {
 	return len(*self)
 }
 
+// Cap returns the capacity of the vector.
 func (self *Vec[T]) Cap() int {
 	return cap(*self)
 }
 
+// IsEmpty returns true if the vector has no elements.
 func (self *Vec[T]) IsEmpty() bool {
 	return self.Len() == 0
 }
 
+// Put appends an element to the end of the vector.
 func (self *Vec[T]) Put(it T) {
 	*self = slices.Insert(*self, self.Len(), it)
 }
 
+// Pop removes and returns the last elements of the vector.
 func (self *Vec[T]) Pop() T {
 	it := (*self)[self.Len()-1]
 	*self = (*self)[:self.Len()-1]
@@ -76,10 +83,12 @@ func (self *Vec[T]) Pop() T {
 	return it
 }
 
+// Ins inserts an element at the specified index in the vector.
 func (self *Vec[T]) Ins(idx int, it T) {
 	*self = slices.Insert(*self, idx, it)
 }
 
+// Del removes and returns the element at the specified index in the vector.
 func (self *Vec[T]) Del(idx int) T {
 	it := (*self)[idx]
 	*self = slices.Delete(*self, idx, idx+1)
@@ -87,22 +96,29 @@ func (self *Vec[T]) Del(idx int) T {
 	return it
 }
 
+// IsExist checks if any element in the vector satisfies the provided function.
 func (self *Vec[T]) IsExist(fn func(it T) bool) bool {
 	return slices.IndexFunc(*self, fn) > 0
 }
 
+// Index returns the first index where the provided function returns true, or -1 if no element
+// matches.
 func (self *Vec[T]) Index(fn func(it T) bool) int {
 	return slices.IndexFunc(*self, fn)
 }
 
+// Sort sorts the vector based on the comparison function provided.
 func (self *Vec[T]) Sort(fn func(a, b T) int) {
 	slices.SortFunc(*self, fn)
 }
 
+// IsSort checks if the vector is sorted according to the comparison function provided.
 func (self *Vec[T]) IsSort(fn func(a, b T) int) bool {
 	return slices.IsSortedFunc(*self, fn)
 }
 
+// Map returns a new Vec constructed by applying the provided function to each element of the
+// vector.
 func (self *Vec[T]) Map(fn func(i int, it T) T) Vec[T] {
 	vec := NewVec[T](self.Len())
 
@@ -113,6 +129,7 @@ func (self *Vec[T]) Map(fn func(i int, it T) T) Vec[T] {
 	return vec
 }
 
+// Filter returns a new Vec containing only the elements that satisfy the provided function.
 func (self *Vec[T]) Filter(fn func(i int, it T) bool) Vec[T] {
 	vec := NewVec[T](self.Len())
 
@@ -125,6 +142,8 @@ func (self *Vec[T]) Filter(fn func(i int, it T) bool) Vec[T] {
 	return vec
 }
 
+// FilterMap returns a new Vec with elements that satisfy the function and applies another
+// transformation.
 func (self *Vec[T]) FilterMap(fn func(i int, it T) (bool, T)) Vec[T] {
 	vec := NewVec[T](self.Len())
 
@@ -137,6 +156,7 @@ func (self *Vec[T]) FilterMap(fn func(i int, it T) (bool, T)) Vec[T] {
 	return vec
 }
 
+// IsAny returns true if any element in the vector satisfies the provided function.
 func (self *Vec[T]) IsAny(fn func(i int, it T) bool) bool {
 	for i, v := range *self {
 		if fn(i, v) {
@@ -147,6 +167,7 @@ func (self *Vec[T]) IsAny(fn func(i int, it T) bool) bool {
 	return false
 }
 
+// IsAll returns true if all elements in the vector satisfy the provided function.
 func (self *Vec[T]) IsAll(fn func(i int, it T) bool) bool {
 	for i, v := range *self {
 		if !fn(i, v) {

@@ -76,3 +76,88 @@ func TestVec_NewVec(t *testing.T) {
 		a.Equal(vec, vec2)
 	}
 }
+
+func TestVec_Len(t *testing.T) {
+	a := assert.New(t)
+
+	tests := []struct {
+		vec Vec[int]
+		len int
+	}{
+		{Vec[int]{}, 0},
+		{Vec[int]{1}, 1},
+		{Vec[int]{1, 2, 3}, 3},
+		{Vec[int]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 10},
+	}
+
+	for _, tt := range tests {
+		a.Equal(tt.len, tt.vec.Len())
+	}
+}
+
+func TestVec_Cap(t *testing.T) {
+	a := assert.New(t)
+
+	tests := []struct {
+		vec Vec[int]
+		cap int
+	}{
+		{Vec[int]{}, 1},
+		{Vec[int]{1}, 2},
+		{Vec[int]{1, 2, 3}, 6},
+		{Vec[int]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 20},
+	}
+
+	for _, tt := range tests {
+		tt.vec.Put(0)
+
+		a.Equal(tt.cap, tt.vec.Cap())
+	}
+}
+
+func TestVec_Put(t *testing.T) {
+	a := assert.New(t)
+
+	vec := Vec[int]{}
+
+	a.True(vec.IsEmpty())
+	a.Equal(0, vec.Len())
+	a.Equal(0, vec.Cap())
+
+	tt := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	for _, v := range tt {
+		vec.Put(v)
+	}
+
+	a.False(vec.IsEmpty())
+	a.Equal(len(tt), vec.Len())
+
+	a.Equal(tt, []int(vec))
+}
+
+func TestVec_Pop(t *testing.T) {
+	a := assert.New(t)
+
+	vec := Vec[int]{1, 2, 3, 4, 5}
+	a.Equal(5, vec.Pop())
+	a.Equal(4, vec.Len())
+
+	a.Equal(4, vec.Pop())
+	a.Equal(3, vec.Len())
+
+	a.Equal(3, vec.Pop())
+	a.Equal(2, vec.Len())
+
+	a.Equal(2, vec.Pop())
+	a.Equal(1, vec.Len())
+
+	a.Equal(1, vec.Pop())
+	a.Equal(0, vec.Len())
+	a.True(vec.IsEmpty())
+
+	a.Equal(5, vec.Cap())
+}
+
+func TestVec_Ins(t *testing.T) {
+
+}
