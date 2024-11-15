@@ -68,7 +68,7 @@ func ToLower(ch byte) byte {
 		return ch
 	}
 
-	return byte(ch + 0x20)
+	return ch + 0x20
 }
 
 // ToUpper converts a character to uppercase
@@ -77,5 +77,5 @@ func ToUpper(ch byte) byte {
 		return ch
 	}
 
-	return byte(ch - 0x20)
+	return ch - 0x20
 }

@@ -9,6 +9,7 @@ import (
 func TestVec_NewVec(t *testing.T) {
 	var vec Vec[int]
 	a := assert.New(t)
+
 	array := [4]int{1, 2, 3, 4}
 	slice := []int{1, 2, 3, 4}
 
